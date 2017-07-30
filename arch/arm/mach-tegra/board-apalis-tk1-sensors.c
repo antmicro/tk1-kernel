@@ -333,7 +333,7 @@ static struct soc_camera_link ov5640_iclink = {
 	.bus_id		= 0, /* This must match the .id of tegra_vi01_device */
 	.board_info	= &apalis_tk1_ov5640_camera_i2c_device,
 	.module_name	= "ov5640",
-	.i2c_adapter_id	= 2,
+	.i2c_adapter_id	= 0,
 	.power		= apalis_tk1_ov5640_power,
 	.priv		= &apalis_tk1_ov5640_camera_platform_data,
 };
@@ -343,6 +343,44 @@ static struct platform_device apalis_tk1_ov5640_soc_camera_device = {
 	.id	= 5,
 	.dev	= {
 		.platform_data = &ov5640_iclink,
+	},
+};
+
+static int apalis_tk1_ov5640_power_1(struct device *dev, int enable) {
+	if(enable) {
+		tegra_io_dpd_disable(&csib_io);
+	} else {
+		tegra_io_dpd_enable(&csib_io);
+	}
+	return 0;
+}
+
+static struct i2c_board_info apalis_tk1_ov5640_camera_i2c_device_1 = {
+	I2C_BOARD_INFO("ov5640", 0x3c),
+};
+
+static struct tegra_camera_platform_data apalis_tk1_ov5640_camera_platform_data_1 = {
+	.flip_v			= 0,
+	.flip_h			= 0,
+	.port			= TEGRA_CAMERA_PORT_CSI_B,
+	.lanes			= 2,
+	.continuous_clk		= 1,
+};
+
+static struct soc_camera_link ov5640_iclink_1 = {
+	.bus_id		= 0, /* This must match the .id of tegra_vi01_device */
+	.board_info	= &apalis_tk1_ov5640_camera_i2c_device_1,
+	.module_name	= "ov5640",
+	.i2c_adapter_id	= 2,
+	.power		= apalis_tk1_ov5640_power_1,
+	.priv		= &apalis_tk1_ov5640_camera_platform_data_1,
+};
+
+static struct platform_device apalis_tk1_ov5640_soc_camera_device_1 = {
+	.name	= "soc-camera-pdrv",
+	.id	= 9,
+	.dev	= {
+		.platform_data = &ov5640_iclink_1,
 	},
 };
 #endif
@@ -1683,6 +1721,7 @@ static int apalis_tk1_camera_init(void)
 
 #if IS_ENABLED(CONFIG_SOC_CAMERA_OV5640)
 	platform_device_register(&apalis_tk1_ov5640_soc_camera_device);
+	platform_device_register(&apalis_tk1_ov5640_soc_camera_device_1);
 #endif
 
 #if IS_ENABLED(CONFIG_SOC_CAMERA_TC358743)
